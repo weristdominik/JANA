@@ -1,0 +1,40 @@
+# Python
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+# Ignore the virtualenv inside src/backend
+src/backend/venv/
+# Ignore pytest cache
+.pytest_cache/
+
+# macOS
+.DS_Store
+
+# Node.js (Frontend part)
+src/frontend/jana/node_modules/
+src/frontend/jana/package-lock.json
+src/frontend/jana/yarn.lock
+src/frontend/jana/npm-debug.log
+src/frontend/jana/yarn-error.log
+
+# VS Code
+.vscode/
+
+# IntelliJ IDEA
+.idea/
+
+# Environment variables
+*.env
+src/backend/.env
+src/frontend/jana/.env
+
+# Backup files
+*.bak
+*.tmp
+*.swp
+
+# JetBrains
+*.iml
