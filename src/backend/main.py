@@ -22,9 +22,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
 app = FastAPI()
 
 # Enable CORS for React app running on localhost:3000
-origins = [
-    "http://localhost:3000",
-]
+origins = os.getenv("CORS_ORIGINS", "").split(",")
 
 app.add_middleware(
     CORSMiddleware,
