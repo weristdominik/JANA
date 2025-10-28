@@ -8,6 +8,7 @@ import {
   Typography,
   IconButton,
   useTheme,
+  Tooltip,
 } from '@mui/material';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 
@@ -88,15 +89,17 @@ const NotesList = ({
           bgcolor: theme.palette.noteBackground.main,
         }}
       >
-        <IconButton
-          sx={{
-            color: theme.palette.primary.main,
-            bgcolor: `${theme.palette.primary.main}10`,
-            '&:hover': { bgcolor: `${theme.palette.primary.main}20` },
-          }}
-        >
-          <NoteAddIcon />
-        </IconButton>
+        <Tooltip title="Add Note">
+          <IconButton
+            sx={{
+              color: theme.palette.primary.main,
+              bgcolor: `${theme.palette.primary.main}10`,
+              '&:hover': { bgcolor: `${theme.palette.primary.main}20` },
+            }}
+          >
+            <NoteAddIcon />
+          </IconButton>
+        </Tooltip>
       </Box>
     </Box>
   );

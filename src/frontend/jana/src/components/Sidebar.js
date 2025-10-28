@@ -10,6 +10,8 @@ import {
   IconButton,
   Box,
   useTheme,
+  Typography,
+  Tooltip,
 } from '@mui/material';
 
 // Icons
@@ -43,24 +45,46 @@ const Sidebar = ({ folders, selectedFolder, onFolderSelect }) => {
           p: 2,
         }}
       >
-        <IconButton
+        <Typography
+          variant="h5"
+          noWrap
+          component="a"
+          //href="#app-bar-with-responsive-menu"
           sx={{
+            mr: 2,
+            mt: 0.5,
+            display: { xs: 'none', md: 'flex' },
+            fontFamily: 'monospace',
+            fontWeight: 700,
+            letterSpacing: '.3rem',
             color: theme.palette.primary.main,
-            bgcolor: `${theme.palette.primary.main}10`,
-            '&:hover': { bgcolor: `${theme.palette.primary.main}20` },
+            textDecoration: 'none',
           }}
         >
-          <CreateNewFolderIcon />
-        </IconButton>
-        <IconButton
-          sx={{
-            color: theme.palette.primary.main,
-            bgcolor: `${theme.palette.primary.main}10`,
-            '&:hover': { bgcolor: `${theme.palette.primary.main}20` },
-          }}
-        >
-          <LogoutIcon />
-        </IconButton>
+          JANA
+        </Typography>
+        <Tooltip title="Add folder">
+          <IconButton
+            sx={{
+              color: theme.palette.primary.main,
+              bgcolor: `${theme.palette.primary.main}10`,
+              '&:hover': { bgcolor: `${theme.palette.primary.main}20` },
+            }}
+          >
+            <CreateNewFolderIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Logout">
+          <IconButton
+            sx={{
+              color: theme.palette.primary.main,
+              bgcolor: `${theme.palette.primary.main}10`,
+              '&:hover': { bgcolor: `${theme.palette.primary.main}20` },
+            }}
+          >
+            <LogoutIcon />
+          </IconButton>
+        </Tooltip>
       </Box>
 
       <List
