@@ -4,7 +4,6 @@ import { Box, useTheme } from '@mui/material';
 import CloudIcon from '@mui/icons-material/Cloud';
 import FolderIcon from '@mui/icons-material/Folder';
 
-import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar';
 import NotesList from './components/NotesList';
 import NoteEditor from './components/NoteEditor';
@@ -12,11 +11,11 @@ import NoteEditor from './components/NoteEditor';
 const NotesApp = () => {
   const theme = useTheme();
 
-  const foldersData = [
+  const [folders, setFolders] = useState ([
     { id: 'icloud', name: 'iCloud', icon: <CloudIcon /> },
     { id: 'personal', name: 'Personal', icon: <FolderIcon /> },
     { id: 'work', name: 'Work', icon: <FolderIcon /> },
-  ];
+  ]);
 
   const notesData = {
     icloud: [
@@ -43,9 +42,10 @@ const NotesApp = () => {
     <Box sx={{ display: 'flex', height: '100vh', bgcolor: theme.palette.background.default }}>
 
       <Sidebar
-        folders={foldersData}
+        folders={folders}
         selectedFolder={selectedFolder}
         onFolderSelect={setSelectedFolder}
+        onAddFolder={(newFolder) => setFolders([...folders, newFolder])}
       />
 
       <NotesList
