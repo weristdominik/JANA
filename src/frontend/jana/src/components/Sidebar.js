@@ -1,25 +1,15 @@
 // src/components/Sidebar.js
 import React, { useState } from 'react';
-import {
-  Drawer,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
-  IconButton,
-  Box,
-  useTheme,
-  Typography,
-  Tooltip,
-} from '@mui/material';
+import { Drawer, Box, Typography, useTheme, IconButton, Tooltip } from '@mui/material';
+import FileExplorer from './FileExplorer';
 
 // Icons
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import LogoutIcon from '@mui/icons-material/Logout';
+
 import AddFolderDialog from './AddFolderDialog';
 
-const Sidebar = ({ folders, selectedFolder, onFolderSelect, onAddFolder }) => {
+const Sidebar = ({ items, onSelectItem, onAddFolder }) => {
   const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -90,53 +80,8 @@ const Sidebar = ({ folders, selectedFolder, onFolderSelect, onAddFolder }) => {
           </Tooltip>
         </Box>
 
-        <List
-          subheader={
-            <ListSubheader
-              component="div"
-              sx={{
-                fontWeight: 600,
-                fontSize: 14,
-                color: theme.palette.secondary.main,
-                lineHeight: 2,
-                bgcolor: 'transparent',
-              }}
-            >
-              FOLDERS
-            </ListSubheader>
-          }
-        >
-          {folders.map((folder) => (
-            <ListItemButton
-              key={folder.id}
-              selected={selectedFolder === folder.id}
-              onClick={() => onFolderSelect(folder.id)}
-              sx={{
-                borderRadius: 1,
-                mx: 1,
-                mb: 0.5,
-                '&.Mui-selected': {
-                  bgcolor: `${theme.palette.primary.main}1A`,
-                  '& .MuiListItemText-primary': {
-                    color: theme.palette.primary.main,
-                    fontWeight: 600,
-                  },
-                  '& .MuiListItemIcon-root': {
-                    color: theme.palette.primary.main,
-                  },
-                },
-              }}
-            >
-              <ListItemIcon sx={{ color: theme.palette.secondary.main }}>
-                {folder.icon}
-              </ListItemIcon>
-              <ListItemText
-                primary={folder.name}
-                primaryTypographyProps={{ fontSize: 15 }}
-              />
-            </ListItemButton>
-          ))}
-        </List>
+        {/* File Explorer */}
+        <FileExplorer items={items} onSelectItem={onSelectItem} />
       </Drawer>
       
       <AddFolderDialog 
