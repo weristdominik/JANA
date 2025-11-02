@@ -7,11 +7,10 @@ import { ITEMS } from './data/itemsData';
 
 const NotesApp = () => {
   const theme = useTheme();
-
   const [items, setItems] = useState(ITEMS);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  // helper to find an item by id in the tree
+  // Find an item by id
   const findItemById = (tree, id) => {
     for (const node of tree) {
       if (node.id === id) return node;
@@ -23,34 +22,46 @@ const NotesApp = () => {
     return null;
   };
 
-  // handle adding a new folder under the selected folder
+  // Recursive delete
+  const deleteItemById = (tree, idToDelete) =>
+    tree
+      .filter((node) => node.id !== idToDelete)
+      .map((node) =>
+        node.children
+          ? { ...node, children: deleteItemById(node.children, idToDelete) }
+          : node
+      );
+
+  // Add folder
   const handleAddFolder = (newFolder) => {
     if (!selectedItem) return;
-
-    const addToFolder = (tree) => {
-      return tree.map(node => {
+    const addToFolder = (tree) =>
+      tree.map((node) => {
         if (node.id === selectedItem && node.fileType === 'folder') {
-          // generate unique id
-          const existingIds = node.children.map(c => c.id);
+          const existingIds = node.children.map((c) => c.id);
           let baseId = newFolder.id;
           let counter = 1;
           while (existingIds.includes(baseId)) {
             baseId = `${newFolder.id}-${counter}`;
             counter++;
           }
-
           return {
             ...node,
-            children: [...node.children, { ...newFolder, id: baseId }]
+            children: [...node.children, { ...newFolder, id: baseId }],
           };
         } else if (node.children) {
           return { ...node, children: addToFolder(node.children) };
         }
         return node;
       });
-    };
+    setItems((prev) => addToFolder(prev));
+  };
 
-    setItems(prev => addToFolder(prev));
+  // Delete item
+  const handleDeleteItem = (item) => {
+    if (!item) return;
+    setItems((prev) => deleteItemById(prev, item.id));
+    if (selectedItem === item.id) setSelectedItem(null);
   };
 
   const selectedData = selectedItem ? findItemById(items, selectedItem) : null;
@@ -63,14 +74,14 @@ const NotesApp = () => {
         bgcolor: theme.palette.background.default,
       }}
     >
-      {/* Sidebar with RichTreeView */}
-      <Sidebar 
-        items={items} 
-        onSelectItem={setSelectedItem} 
-        onAddFolder={handleAddFolder} 
+      <Sidebar
+        items={items}
+        onSelectItem={setSelectedItem}
+        onAddFolder={handleAddFolder}
+        onDeleteItem={handleDeleteItem}
+        selectedItem={selectedData} // ✅ pass the selected item object
       />
 
-      {/* Note Editor Area */}
       <Box
         sx={{
           flexGrow: 1,
@@ -81,7 +92,7 @@ const NotesApp = () => {
         }}
       >
         {selectedData ? (
-          selectedData.children ? (  // if children exist, it's a folder
+          selectedData.children ? (
             <Typography variant="h6" color="text.secondary">
               This is a folder: {selectedData.label}
             </Typography>
