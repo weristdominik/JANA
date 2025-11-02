@@ -87,7 +87,10 @@ const Sidebar = ({ items, onSelectItem, onAddFolder }) => {
       <AddFolderDialog 
         open={openDialog}
         onClose={() => setOpenDialog(false)}
-        onAdd={onAddFolder}
+        onAdd={(newFolder) => {
+          onAddFolder(newFolder);
+          setOpenDialog(false);
+        }}
       />
     </>
   );

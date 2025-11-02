@@ -8,6 +8,7 @@ import { ITEMS } from './data/itemsData';
 const NotesApp = () => {
   const theme = useTheme();
 
+  const [items, setItems] = useState(ITEMS);
   const [selectedItem, setSelectedItem] = useState(null);
 
   // helper to find an item by id in the tree
@@ -22,7 +23,37 @@ const NotesApp = () => {
     return null;
   };
 
-  const selectedData = selectedItem ? findItemById(ITEMS, selectedItem) : null;
+  // handle adding a new folder under the selected folder
+  const handleAddFolder = (newFolder) => {
+    if (!selectedItem) return;
+
+    const addToFolder = (tree) => {
+      return tree.map(node => {
+        if (node.id === selectedItem && node.fileType === 'folder') {
+          // generate unique id
+          const existingIds = node.children.map(c => c.id);
+          let baseId = newFolder.id;
+          let counter = 1;
+          while (existingIds.includes(baseId)) {
+            baseId = `${newFolder.id}-${counter}`;
+            counter++;
+          }
+
+          return {
+            ...node,
+            children: [...node.children, { ...newFolder, id: baseId }]
+          };
+        } else if (node.children) {
+          return { ...node, children: addToFolder(node.children) };
+        }
+        return node;
+      });
+    };
+
+    setItems(prev => addToFolder(prev));
+  };
+
+  const selectedData = selectedItem ? findItemById(items, selectedItem) : null;
 
   return (
     <Box
@@ -33,7 +64,11 @@ const NotesApp = () => {
       }}
     >
       {/* Sidebar with RichTreeView */}
-      <Sidebar items={ITEMS} onSelectItem={setSelectedItem} />
+      <Sidebar 
+        items={items} 
+        onSelectItem={setSelectedItem} 
+        onAddFolder={handleAddFolder} 
+      />
 
       {/* Note Editor Area */}
       <Box
