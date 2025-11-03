@@ -57,6 +57,45 @@ const NotesApp = () => {
     setItems((prev) => addToFolder(prev));
   };
 
+  // Add doc
+  const handleAddItem = (newItem) => {
+    console.log(newItem)
+    if (!selectedItem) return;
+
+    const addToFolder = (nodes) =>
+      nodes.map((node) => {
+        if (node.id === selectedItem && node.fileType === 'folder') {
+          // ✅ Add new item to the selected folder
+          const existingIds = node.children?.map((c) => c.id) || [];
+          let baseId = newItem.id;
+          let counter = 1;
+          while (existingIds.includes(baseId)) {
+            baseId = `${newItem.id}-${counter}`;
+            counter++;
+          }
+
+          return {
+            ...node,
+            children: [...(node.children || []), { ...newItem, id: baseId }],
+          };
+        }
+
+        // ✅ If this node has children, recursively check them too
+        if (node.children) {
+          const updatedChildren = addToFolder(node.children);
+          // Only rebuild this node if something changed
+          if (updatedChildren !== node.children) {
+            return { ...node, children: updatedChildren };
+          }
+        }
+
+      return node;
+    });
+
+    setItems((prevItems) => addToFolder(prevItems));
+  };
+
+
   // Delete item
   const handleDeleteItem = (item) => {
     if (!item) return;
@@ -78,6 +117,7 @@ const NotesApp = () => {
         items={items}
         onSelectItem={setSelectedItem}
         onAddFolder={handleAddFolder}
+        onAddItem={handleAddItem}
         onDeleteItem={handleDeleteItem}
         selectedItem={selectedData} // ✅ pass the selected item object
       />

@@ -6,6 +6,8 @@ import LoginPage from './Login';
 import NotesApp from './NotesApp';
 import ProtectedRoute from './ProtectedRoute';
 
+import Notes from './Notes';
+
 function App() {
   
   return (
@@ -17,6 +19,7 @@ function App() {
             element={<ProtectedRoute element={<NotesApp />} />}
           />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/notes" element={<Notes />} /> 
         </Routes>
       </Router>
     </ThemeProvider>
