@@ -14,10 +14,12 @@ import FileExplorer from './FileExplorer';
 
 // Icons
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import EditDocumentIcon from '@mui/icons-material/EditDocument';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import LogoutIcon from '@mui/icons-material/Logout';
 
 import AddFolderDialog from './AddFolderDialog';
+import AddItemDialog from './AddItem.Dialog';
 import DeleteItemDialog from './DeleteItemDialog';
 import ErrorDialog from './ErrorDialog';
 
@@ -25,12 +27,14 @@ const Sidebar = ({
   items,
   onSelectItem,
   onAddFolder,
+  onAddItem,
   onDeleteItem,
-  selectedItem, // ✅ new prop
+  selectedItem,
 }) => {
   const theme = useTheme();
 
   const [openAddDialog, setOpenAddDialog] = useState(false);
+  const [openAddItemDialog, setOpenAddItemDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [error, setError] = useState({
@@ -62,7 +66,6 @@ const Sidebar = ({
       return;
     }
 
-    // 🚫 prevent deleting Trash
     if (selectedItem.label === 'Trash' || selectedItem.fileType === 'trash') {
       setError({
         open: true,
@@ -126,7 +129,20 @@ const Sidebar = ({
               </IconButton>
             </Tooltip>
 
-            <Tooltip title="Delete selected item">
+            <Tooltip title="Add doc">
+              <IconButton
+                onClick={() => setOpenAddItemDialog(true)}
+                sx={{
+                  color: theme.palette.primary.main,
+                  bgcolor: `${theme.palette.primary.main}10`,
+                  '&:hover': { bgcolor: `${theme.palette.primary.main}20` },
+                }}
+              >
+                <EditDocumentIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Delete">
               <IconButton
                 onClick={handleTopDeleteClick} // ✅ now deletes selected
                 sx={{
@@ -169,6 +185,15 @@ const Sidebar = ({
         onAdd={(newFolder) => {
           onAddFolder(newFolder);
           setOpenAddDialog(false);
+        }}
+      />
+
+      <AddItemDialog
+        open={openAddItemDialog}
+        onClose={() => setOpenAddItemDialog(false)}
+        onAdd={(newItem) => {
+          onAddItem(newItem);
+          setOpenAddItemDialog(false);
         }}
       />
 

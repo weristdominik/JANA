@@ -1,4 +1,3 @@
-// src/components/AddFolderDialog.js
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -9,43 +8,44 @@ import {
   TextField,
 } from '@mui/material';
 
-const AddFolderDialog = ({ open, onClose, onAdd }) => {
-  const [folderName, setFolderName] = useState('');
-  const isValidName = folderName.trim().length > 0;
+const AddItemDialog = ({ open, onClose, onAdd }) => {
+  const [itemName, setItemName] = useState('');
+
+  const isValidName = itemName.trim().length > 0;
 
   const handleAdd = () => {
     if (!isValidName) return;
 
-    const newFolder = {
-      id: folderName.toLowerCase().replace(/\s+/g, '-'),
-      label: folderName.trim(),
-      fileType: 'folder',
-      children: [],
+    const newItem = {
+      id: itemName.toLowerCase().replace(/\s+/g, '-'),
+      label: itemName.trim(),
+      fileType: 'doc',
+      content: 'NEW',
     };
 
-    onAdd(newFolder);
-    setFolderName('');
+    onAdd(newItem);
+    setItemName('');
     onClose();
   };
 
   const handleClose = () => {
-    setFolderName('');
+    setItemName('');
     onClose();
   };
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Add New Folder</DialogTitle>
+      <DialogTitle>Add New Doc</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
           margin="dense"
-          label="Folder name"
+          label="Doc name"
           type="text"
           fullWidth
           variant="outlined"
-          value={folderName}
-          onChange={(e) => setFolderName(e.target.value)}
+          value={itemName}
+          onChange={(e) => setItemName(e.target.value)}
         />
       </DialogContent>
       <DialogActions>
@@ -55,11 +55,11 @@ const AddFolderDialog = ({ open, onClose, onAdd }) => {
           onClick={handleAdd}
           disabled={!isValidName} // disables button if folderName empty or whitespace
         >
-          Add Folder
+          Add Doc
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default AddFolderDialog;
+export default AddItemDialog;
