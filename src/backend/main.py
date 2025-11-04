@@ -50,6 +50,11 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 
+# File Content
+class FileRequest(BaseModel):
+    file_path: str
+
+
 # User authentication
 class User(BaseModel):
     username: str
@@ -325,14 +330,13 @@ async def delete_file(file_id: str = Body(..., embed=True)):
     }
 
 
-@app.get("/api/read-file")
-async def read_file(file_id: str):
-    file_path = Path(file_id)
+@app.post("/api/get-file-content")
+async def get_file_content(payload: FileRequest):
+    file_path = Path(payload.file_path)
     if not file_path.exists() or not file_path.is_file():
         raise HTTPException(status_code=404, detail="File not found.")
 
     try:
-        # JSON-based rich text
         content = file_path.read_text(encoding="utf-8")
         return {"id": str(file_path.resolve()), "label": file_path.name, "content": content}
     except Exception:
