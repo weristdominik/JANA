@@ -55,6 +55,11 @@ class FileRequest(BaseModel):
     file_path: str
 
 
+class SaveFileRequest(BaseModel):
+    file_path: str
+    content: str
+
+
 # User authentication
 class User(BaseModel):
     username: str
@@ -341,3 +346,17 @@ async def get_file_content(payload: FileRequest):
         return {"id": str(file_path.resolve()), "label": file_path.name, "content": content}
     except Exception:
         raise HTTPException(status_code=500, detail="Failed to read file.")
+
+
+@app.post("/api/save-file-content")
+async def save_file_content(payload: SaveFileRequest):
+    file_path = Path(payload.file_path)
+    if not file_path.exists() or not file_path.is_file():
+        raise HTTPException(status_code=404, detail="File not found.")
+
+    try:
+        # Save the content (as string)
+        file_path.write_text(payload.content, encoding="utf-8")
+        return {"message": f"Saved file {file_path.name} successfully"}
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to save file.")
