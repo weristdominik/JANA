@@ -1,0 +1,32 @@
+{
+  "document": {
+    "title": "Test Document",
+    "author": "Domin",
+    "created_at": "2025-11-03T10:00:00Z",
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "This is the first paragraph of the document."
+      },
+      {
+        "type": "paragraph",
+        "text": "You can have multiple paragraphs in a rich JSON file."
+      },
+      {
+        "type": "list",
+        "style": "bullet",
+        "items": [
+          "Item 1",
+          "Item 2",
+          "Item 3"
+        ]
+      },
+      {
+        "type": "code",
+        "language": "python",
+        "code": "def hello():\n    print('Hello, World!')\nhello()"
+      }
+    ]
+  }
+}
+
