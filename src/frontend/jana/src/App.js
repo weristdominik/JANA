@@ -19,7 +19,12 @@ function App() {
             element={<ProtectedRoute element={<NotesApp />} />}
           />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/notes" element={<Notes />} /> 
+          {process.env.REACT_APP_JANA_DEBUG === "true" && (
+            <Route
+              path="/debug"
+              element={<ProtectedRoute element={<Notes />} />}
+            />
+          )}
         </Routes>
       </Router>
     </ThemeProvider>
