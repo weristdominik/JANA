@@ -1,151 +1,295 @@
-// src/NotesApp.js
-import React, { useState } from 'react';
-import { Box, useTheme, Typography } from '@mui/material';
-import NoteEditor from './components/NoteEditor';
-import Sidebar from './components/Sidebar';
-import { ITEMS } from './data/itemsData';
+// NotesApp.js
+import React, { useEffect, useState } from "react";
+import {
+  ThemeProvider,
+  CssBaseline,
+  Box,
+  Drawer,
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  useMediaQuery,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import NoteEditor from "./components/notes/NoteEditor";
+import Sidebar from "./components/notes/Sidebar";
+import theme from "./theme/theme.js";
+
+const drawerWidth = 280;
 
 const NotesApp = () => {
-  const theme = useTheme();
-  const [items, setItems] = useState(ITEMS);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [treeData, setTreeData] = useState([]);
+  const [fileContent, setFileContent] = useState(null);
+  const [lastSelectedItem, setLastSelectedItem] = useState(null);
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // Find an item by id
-  const findItemById = (tree, id) => {
-    for (const node of tree) {
-      if (node.id === id) return node;
-      if (node.children) {
-        const found = findItemById(node.children, id);
-        if (found) return found;
+  // Fetch tree
+  useEffect(() => {
+    fetchTree();
+  }, []);
+
+  const fetchTree = async () => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/tree`);
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const data = await res.json();
+      setTreeData(data);
+    } catch (err) {
+      console.error("Error fetching tree data:", err);
+    }
+  };
+
+  // Selection logic
+  const handleItemSelectionToggle = (event, itemId, isSelected) => {
+    const findNodeById = (nodes, id) => {
+      for (const node of nodes) {
+        if (node.id === id) return node;
+        if (node.children) {
+          const found = findNodeById(node.children, id);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    if (isSelected) {
+      const node = findNodeById(treeData, itemId);
+      setLastSelectedItem(node);
+
+      if (node.type === "file") {
+        fetchFileContent(node.id);
+        // Only close drawer when file is selected
+        if (isMobile) setMobileOpen(false);
+      } else {
+        setFileContent(null);
       }
     }
-    return null;
   };
 
-  // Recursive delete
-  const deleteItemById = (tree, idToDelete) =>
-    tree
-      .filter((node) => node.id !== idToDelete)
-      .map((node) =>
-        node.children
-          ? { ...node, children: deleteItemById(node.children, idToDelete) }
-          : node
+  // Fetch file content
+  const fetchFileContent = async (filePath) => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/get-file-content`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ file_path: filePath }),
+        }
       );
 
-  // Add folder
-  const handleAddFolder = (newFolder) => {
-    if (!selectedItem) return;
-    const addToFolder = (tree) =>
-      tree.map((node) => {
-        if (node.id === selectedItem && node.fileType === 'folder') {
-          const existingIds = node.children.map((c) => c.id);
-          let baseId = newFolder.id;
-          let counter = 1;
-          while (existingIds.includes(baseId)) {
-            baseId = `${newFolder.id}-${counter}`;
-            counter++;
-          }
-          return {
-            ...node,
-            children: [...node.children, { ...newFolder, id: baseId }],
-          };
-        } else if (node.children) {
-          return { ...node, children: addToFolder(node.children) };
-        }
-        return node;
-      });
-    setItems((prev) => addToFolder(prev));
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || "Failed to fetch file content");
+      }
+
+      const data = await res.json();
+      try {
+        const parsed = JSON.parse(data.content);
+        setFileContent(parsed);
+      } catch {
+        setFileContent(data.content);
+      }
+    } catch (error) {
+      console.error("Error fetching file content:", error);
+      alert(`Error fetching file content: ${error.message}`);
+      setFileContent(null);
+    }
   };
 
-  // Add doc
-  const handleAddItem = (newItem) => {
-    console.log(newItem)
-    if (!selectedItem) return;
+  // Add Folder
+  const handleAddFolder = async () => {
+    if (!lastSelectedItem) return alert("No Item selected!");
+    if (lastSelectedItem.type !== "folder")
+      return alert("You can only add a folder under a folder!");
 
-    const addToFolder = (nodes) =>
-      nodes.map((node) => {
-        if (node.id === selectedItem && node.fileType === 'folder') {
-          // ✅ Add new item to the selected folder
-          const existingIds = node.children?.map((c) => c.id) || [];
-          let baseId = newItem.id;
-          let counter = 1;
-          while (existingIds.includes(baseId)) {
-            baseId = `${newItem.id}-${counter}`;
-            counter++;
-          }
+    const folderName = prompt("Enter new folder name:", "Folder1");
+    if (!folderName?.trim()) return alert("Folder name cannot be empty!");
 
-          return {
-            ...node,
-            children: [...(node.children || []), { ...newItem, id: baseId }],
-          };
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/add-folder`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            parent_id: lastSelectedItem.id,
+            folder_name: folderName.trim(),
+          }),
         }
+      );
 
-        // ✅ If this node has children, recursively check them too
-        if (node.children) {
-          const updatedChildren = addToFolder(node.children);
-          // Only rebuild this node if something changed
-          if (updatedChildren !== node.children) {
-            return { ...node, children: updatedChildren };
-          }
-        }
-
-      return node;
-    });
-
-    setItems((prevItems) => addToFolder(prevItems));
+      if (res.status === 201) {
+        const newFolder = await res.json();
+        const addFolderToTree = (nodes, parentId, folder) =>
+          nodes.map((node) =>
+            node.id === parentId
+              ? { ...node, children: [...(node.children || []), folder] }
+              : node.children
+              ? { ...node, children: addFolderToTree(node.children, parentId, folder) }
+              : node
+          );
+        setTreeData((prev) => addFolderToTree(prev, lastSelectedItem.id, newFolder));
+      }
+    } catch (error) {
+      console.error("Failed to add folder:", error);
+    }
   };
 
+  // Add File
+  const handleAddDoc = async () => {
+    if (!lastSelectedItem) return alert("No Item selected!");
+    if (lastSelectedItem.type !== "folder")
+      return alert("You can only add a doc under a folder!");
 
-  // Delete item
-  const handleDeleteItem = (item) => {
-    if (!item) return;
-    setItems((prev) => deleteItemById(prev, item.id));
-    if (selectedItem === item.id) setSelectedItem(null);
+    const fileName = prompt("Enter new doc name:", "NewDoc.txt");
+    if (!fileName?.trim()) return alert("Doc name cannot be empty!");
+
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/add-file`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            parent_id: lastSelectedItem.id,
+            file_name: fileName.trim(),
+          }),
+        }
+      );
+
+      if (res.status === 201) {
+        const newFile = await res.json();
+        const addFileToTree = (nodes, parentId, fileNode) =>
+          nodes.map((node) =>
+            node.id === parentId
+              ? { ...node, children: [...(node.children || []), fileNode] }
+              : node.children
+              ? { ...node, children: addFileToTree(node.children, parentId, fileNode) }
+              : node
+          );
+        setTreeData((prev) => addFileToTree(prev, lastSelectedItem.id, newFile));
+      }
+    } catch (error) {
+      console.error("Failed to add file:", error);
+    }
   };
 
-  const selectedData = selectedItem ? findItemById(items, selectedItem) : null;
+  // Delete Item
+  const handleDeleteItem = async () => {
+    if (!lastSelectedItem) return alert("No Item selected!");
+    const endpoint =
+      lastSelectedItem.type === "folder"
+        ? "/api/delete-folder"
+        : "/api/delete-file";
+
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}${endpoint}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            [lastSelectedItem.type === "folder"
+              ? "folder_id"
+              : "file_id"]: lastSelectedItem.id,
+          }),
+        }
+      );
+
+      if (res.ok) {
+        await res.json();
+        fetchTree();
+        setLastSelectedItem(null);
+        setFileContent(null);
+      }
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
+  };
+
+  // Sidebar layout
+  const sidebar = (
+    <Sidebar
+      treeData={treeData}
+      onItemSelect={handleItemSelectionToggle}
+      onAddFolder={handleAddFolder}
+      onAddFile={handleAddDoc}
+      onDeleteItem={handleDeleteItem}
+    />
+  );
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        height: '100vh',
-        bgcolor: theme.palette.background.default,
-      }}
-    >
-      <Sidebar
-        items={items}
-        onSelectItem={setSelectedItem}
-        onAddFolder={handleAddFolder}
-        onAddItem={handleAddItem}
-        onDeleteItem={handleDeleteItem}
-        selectedItem={selectedData} // ✅ pass the selected item object
-      />
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+        {/* Sidebar Drawer */}
+        {isMobile ? (
+          <>
+            <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1 }}>
+              <Toolbar>
+                <IconButton color="inherit" edge="start" onClick={() => setMobileOpen(!mobileOpen)}>
+                  <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" sx={{ ml: 2 }}>
+                  JANA
+                </Typography>
+              </Toolbar>
+            </AppBar>
 
-      <Box
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        {selectedData ? (
-          selectedData.children ? (
-            <Typography variant="h6" color="text.secondary">
-              This is a folder: {selectedData.label}
-            </Typography>
-          ) : (
-            <NoteEditor note={selectedData} />
-          )
+            <Drawer
+              variant="temporary"
+              open={mobileOpen}
+              onClose={() => setMobileOpen(false)}
+              ModalProps={{ keepMounted: true }}
+              sx={{
+                "& .MuiDrawer-paper": {
+                  width: drawerWidth,
+                  backgroundColor: "sidebar.main",
+                },
+              }}
+            >
+              {sidebar}
+            </Drawer>
+          </>
         ) : (
-          <Typography variant="h6" color="text.secondary">
-            Select a file from the sidebar.
-          </Typography>
+          <Drawer
+            variant="permanent"
+            sx={{
+              width: drawerWidth,
+              flexShrink: 0,
+              "& .MuiDrawer-paper": {
+                width: drawerWidth,
+                backgroundColor: "sidebar.main",
+              },
+            }}
+          >
+            {sidebar}
+          </Drawer>
         )}
+
+        {/* Editor Area */}
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            bgcolor: "background.default",
+            p: { xs: 1.5, sm: 2 }, // less padding on mobile
+            pt: { xs: 2, sm: 3 },  // small top space for breathing room
+            mt: isMobile ? 6 : 0,  // smaller margin when app bar present
+            overflow: "auto",
+          }}
+        >
+          <NoteEditor
+            content={fileContent}
+            lastSelectedItem={lastSelectedItem}
+            onChange={(json) => setFileContent(json)}
+          />
+        </Box>
       </Box>
-    </Box>
+    </ThemeProvider>
   );
 };
 

@@ -20,13 +20,17 @@ export default function NoteEditor({ content, onChange, lastSelectedItem }) {
   // Re-set editor content if the parent fileContent changes
   useEffect(() => {
     if (!editor) return;
-    if (content) {
-      editor.commands.setContent(content);
-    } else {
+    if (!content) {
       editor.commands.clearContent();
+      return;
+    }
+
+    // Avoid resetting content if it's the same
+    const current = editor.getJSON();
+    if (JSON.stringify(current) !== JSON.stringify(content)) {
+      editor.commands.setContent(content);
     }
   }, [content, editor]);
-
 
   if (!editor) return <div>Loading editor...</div>;
 
