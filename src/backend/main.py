@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 # Load environment variables from .env file
 load_dotenv()
@@ -143,11 +143,11 @@ def move_to_trash(path: Path):
         )
 
     target = trash_dir / path.name
+
+    # If target exists, append timestamp
     if target.exists():
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"An item with name '{path.name}' already exists in Trash."
-        )
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        target = trash_dir / f"{path.stem}_{timestamp}{path.suffix}"
 
     shutil.move(str(path), str(target))
     return str(target)
@@ -167,46 +167,45 @@ async def read_file_tree():
 
 @app.post("/api/add-folder", status_code=status.HTTP_201_CREATED)
 async def add_folder(
-    parent_id: str = Body(..., embed=True),  # lastSelectedItem.id
-    folder_name: str = Body(..., embed=True)  # name of the new folder
+    parent_id: Optional[str] = Body(None, embed=True),  # now optional
+    folder_name: str = Body(..., embed=True)
 ):
-    """
-    Adds a new folder under `parent_id` with the given `folder_name`.
-    Returns the new folder info on success (HTTP 201).
-    """
-
     DATA_DIR = Path(get_data_dir()).resolve()
-    parent_path = Path(parent_id).resolve()
 
-    # Ensure parent is inside DATA_DIR
-    if not str(parent_path).startswith(str(DATA_DIR)):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Invalid path."
-        )
+    if parent_id:
+        parent_path = Path(parent_id).resolve()
 
-    # Ensure parent exists
-    if not parent_path.exists():
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Parent path does not exist."
-        )
+        # Ensure parent is inside DATA_DIR
+        if not str(parent_path).startswith(str(DATA_DIR)):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid path."
+            )
 
-    # Ensure parent is a folder
-    if not parent_path.is_dir():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot add folder under a file."
-        )
+        # Ensure parent exists
+        if not parent_path.exists():
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Parent path does not exist."
+            )
 
-    # Sanitize folder name (basic checks)
+        # Ensure parent is a folder
+        if not parent_path.is_dir():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot add folder under a file."
+            )
+    else:
+        # parent_id not provided → use DATA_DIR as root
+        parent_path = DATA_DIR
+
+    # Sanitize folder name
     if not folder_name.strip() or "/" in folder_name or "\\" in folder_name:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid folder name."
         )
 
-    # Ensure folder does not already exist
     new_folder_path = parent_path / folder_name
     if new_folder_path.exists():
         raise HTTPException(
@@ -215,7 +214,6 @@ async def add_folder(
         )
 
     try:
-        # Create the folder
         new_folder_path.mkdir(parents=False, exist_ok=False)
     except PermissionError:
         raise HTTPException(
@@ -228,7 +226,6 @@ async def add_folder(
             detail="Failed to create folder."
         )
 
-    # Return newly created folder info in same format as tree
     return {
         "id": str(new_folder_path.resolve()),
         "label": folder_name,

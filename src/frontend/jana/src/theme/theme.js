@@ -53,6 +53,17 @@ const theme = createTheme({
       },
     },
   },
+  custom: {
+    roundButton: {
+      bgcolor: "#ffe5e6",
+      color: airbnbColors.primary,
+      transition: "all 0.25s ease",
+      "&:hover": {
+        bgcolor: airbnbColors.primary,
+        color: "#fff",
+      },
+    },
+  },
 });
 
 export default theme;

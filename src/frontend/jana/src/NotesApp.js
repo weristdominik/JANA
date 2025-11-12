@@ -101,10 +101,7 @@ const NotesApp = () => {
 
   // Add Folder
   const handleAddFolder = async () => {
-    if (!lastSelectedItem) return alert("No Item selected!");
-    if (lastSelectedItem.type !== "folder")
-      return alert("You can only add a folder under a folder!");
-
+    const parentId = lastSelectedItem?.id || null; // null if nothing selected
     const folderName = prompt("Enter new folder name:", "Folder1");
     if (!folderName?.trim()) return alert("Folder name cannot be empty!");
 
@@ -115,7 +112,7 @@ const NotesApp = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            parent_id: lastSelectedItem.id,
+            parent_id: parentId, // backend should handle null as root
             folder_name: folderName.trim(),
           }),
         }
@@ -123,15 +120,21 @@ const NotesApp = () => {
 
       if (res.status === 201) {
         const newFolder = await res.json();
-        const addFolderToTree = (nodes, parentId, folder) =>
-          nodes.map((node) =>
-            node.id === parentId
-              ? { ...node, children: [...(node.children || []), folder] }
-              : node.children
-              ? { ...node, children: addFolderToTree(node.children, parentId, folder) }
-              : node
-          );
-        setTreeData((prev) => addFolderToTree(prev, lastSelectedItem.id, newFolder));
+        if (parentId) {
+          // Add folder under selected node
+          const addFolderToTree = (nodes, pid, folder) =>
+            nodes.map((node) =>
+              node.id === pid
+                ? { ...node, children: [...(node.children || []), folder] }
+                : node.children
+                ? { ...node, children: addFolderToTree(node.children, pid, folder) }
+                : node
+            );
+          setTreeData((prev) => addFolderToTree(prev, parentId, newFolder));
+        } else {
+          // Add folder at root
+          setTreeData((prev) => [...prev, newFolder]);
+        }
       }
     } catch (error) {
       console.error("Failed to add folder:", error);
