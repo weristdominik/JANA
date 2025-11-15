@@ -7,6 +7,7 @@ import NotesApp from './NotesApp';
 import ProtectedRoute from './ProtectedRoute';
 
 import DebugNotesApp from './DebugNotesApp'
+import NoteEditor from './components/notes/NoteEditor.tsx';
 
 function App() {
   
@@ -19,6 +20,7 @@ function App() {
             element={<ProtectedRoute element={<NotesApp />} />}
           />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/editor" element={<NoteEditor />} />
           {process.env.REACT_APP_JANA_DEBUG === "true" && (
             <Route
               path="/debug"

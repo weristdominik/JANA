@@ -1,31 +1,31 @@
 // theme.js
 import { createTheme } from '@mui/material/styles';
 
-const airbnbColors = {
-  primary: '#FF5A5F',      // Airbnb coral
-  secondary: '#484848',    // Deep gray text
-  background: '#FFFFFF',   // App background
-  sidebar: '#f5f5f7',      // Sidebar background
-  noteBackground: '#f7f7f7' // Notes/editor background
+const appleNotesColors = {
+  primary: '#FFD52E',       // Sunglow
+  secondary: '#484848',     // Deep gray text (same as before)
+  background: '#F9F9F9',    // Ghost White
+  sidebar: '#E5E5E5',       // Platinum
+  noteBackground: '#FFD52E33' // Sunglow with light opacity for note background
 };
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: airbnbColors.primary,
+      main: appleNotesColors.primary,
     },
     secondary: {
-      main: airbnbColors.secondary,
+      main: appleNotesColors.secondary,
     },
     background: {
-      default: airbnbColors.background,
-      paper: airbnbColors.noteBackground,
+      default: appleNotesColors.background,
+      paper: appleNotesColors.noteBackground,
     },
     sidebar: {
-      main: airbnbColors.sidebar,
+      main: appleNotesColors.sidebar,
     },
     noteBackground: {
-      main: airbnbColors.noteBackground,
+      main: appleNotesColors.noteBackground,
     },
   },
   typography: {
@@ -34,33 +34,33 @@ const theme = createTheme({
       fontWeight: 'bold',
     },
     body2: {
-      color: airbnbColors.secondary,
+      color: appleNotesColors.secondary,
     },
   },
   components: {
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: airbnbColors.primary,
+          backgroundColor: appleNotesColors.primary,
         },
       },
     },
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: airbnbColors.sidebar,
+          backgroundColor: appleNotesColors.sidebar,
         },
       },
     },
   },
   custom: {
     roundButton: {
-      bgcolor: "#ffe5e6",
-      color: airbnbColors.primary,
+      bgcolor: "#F9F9F9",          // Ghost White background for button
+      color: appleNotesColors.primary, // Sunglow text
       transition: "all 0.25s ease",
       "&:hover": {
-        bgcolor: airbnbColors.primary,
-        color: "#fff",
+        bgcolor: appleNotesColors.primary, // Sunglow bg on hover
+        color: "#fff",                      // white text on hover
       },
     },
   },
