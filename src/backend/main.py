@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 
 # Load environment variables from .env file
 load_dotenv()
@@ -57,7 +57,7 @@ class FileRequest(BaseModel):
 
 class SaveFileRequest(BaseModel):
     file_path: str
-    content: str
+    content: Any
 
 
 # User authentication
@@ -335,12 +335,25 @@ async def delete_file(file_id: str = Body(..., embed=True)):
 @app.post("/api/get-file-content")
 async def get_file_content(payload: FileRequest):
     file_path = Path(payload.file_path)
+
     if not file_path.exists() or not file_path.is_file():
         raise HTTPException(status_code=404, detail="File not found.")
 
     try:
-        content = file_path.read_text(encoding="utf-8")
-        return {"id": str(file_path.resolve()), "label": file_path.name, "content": content}
+        import json
+        raw = file_path.read_text(encoding="utf-8")
+
+        try:
+            content = json.loads(raw)
+        except json.JSONDecodeError:
+            content = None  # file was empty or invalid, frontend will handle
+
+        return {
+            "id": str(file_path.resolve()),
+            "label": file_path.name,
+            "content": content,
+        }
+
     except Exception:
         raise HTTPException(status_code=500, detail="Failed to read file.")
 
@@ -348,12 +361,13 @@ async def get_file_content(payload: FileRequest):
 @app.post("/api/save-file-content")
 async def save_file_content(payload: SaveFileRequest):
     file_path = Path(payload.file_path)
-    if not file_path.exists() or not file_path.is_file():
-        raise HTTPException(status_code=404, detail="File not found.")
+
+    if not file_path.parent.exists():
+        raise HTTPException(status_code=400, detail="Parent folder does not exist")
 
     try:
-        # Save the content (as string)
-        file_path.write_text(payload.content, encoding="utf-8")
+        import json
+        file_path.write_text(json.dumps(payload.content, indent=2), encoding="utf-8")
         return {"message": f"Saved file {file_path.name} successfully"}
-    except Exception:
-        raise HTTPException(status_code=500, detail="Failed to save file.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
