@@ -14,6 +14,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import Sidebar from "./components/notes/Sidebar";
 import theme from "./theme/theme.js";
+import NoteEditor from "./components/notes/NoteEditor.tsx";
 
 const drawerWidth = 280;
 
@@ -284,7 +285,7 @@ const NotesApp = () => {
             overflow: "auto",
           }}
         >
-          <h1>EDITOR</h1>  
+          <NoteEditor /> 
         </Box>
       </Box>
     </ThemeProvider>

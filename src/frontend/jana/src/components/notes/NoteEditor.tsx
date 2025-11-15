@@ -226,8 +226,10 @@ export default function NoteEditor() {
 
   return (
     <div>
-      <MenuBar editor={editor} />
-      <EditorContent editor={editor} />
+        <MenuBar editor={editor} />
+        <div style={{ marginTop: 20 }}> {/* 16px padding */}
+            <EditorContent editor={editor} />
+        </div>
     </div>
   )
 }
