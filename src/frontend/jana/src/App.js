@@ -6,7 +6,7 @@ import LoginPage from './Login';
 import NotesApp from './NotesApp';
 import ProtectedRoute from './ProtectedRoute';
 
-import Notes from './Notes';
+import DebugNotesApp from './DebugNotesApp'
 
 function App() {
   
@@ -22,7 +22,7 @@ function App() {
           {process.env.REACT_APP_JANA_DEBUG === "true" && (
             <Route
               path="/debug"
-              element={<ProtectedRoute element={<Notes />} />}
+              element={<ProtectedRoute element={<DebugNotesApp />} />}
             />
           )}
         </Routes>
