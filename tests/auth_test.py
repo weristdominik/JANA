@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from fastapi import status
 from dotenv import load_dotenv
 from backend.main import app
+from datetime import datetime, timezone, timedelta
 
 # Load environment variables from the .env file located in the 'backend' directory
 load_dotenv(dotenv_path='src/backend/.env')
@@ -96,3 +97,20 @@ def test_protected_route_invalid_token():
     data = response.json()
 
     assert data["detail"] == "Invalid token"
+
+
+# Test expired JWT Token
+def test_expired_token():
+    expired_time = datetime.now(timezone.utc) - timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES + 5)
+    json_payload = {
+        "sub": os.getenv('USERNAME'),
+        "exp": expired_time
+    }
+    expired_token = jwt.encode(payload=json_payload, key=os.getenv('SECRET_KEY'), algorithm=os.getenv("ALGORITHM"))
+
+    response = client.get(
+        "/protected",
+        headers={"Authorization": f"Bearer {expired_token}"}
+    )
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED

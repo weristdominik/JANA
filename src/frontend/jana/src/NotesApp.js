@@ -12,7 +12,6 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import NoteEditor from "./components/notes/NoteEditor";
 import Sidebar from "./components/notes/Sidebar";
 import theme from "./theme/theme.js";
 
@@ -285,11 +284,7 @@ const NotesApp = () => {
             overflow: "auto",
           }}
         >
-          <NoteEditor
-            content={fileContent}
-            lastSelectedItem={lastSelectedItem}
-            onChange={(json) => setFileContent(json)}
-          />
+          <h1>EDITOR</h1>  
         </Box>
       </Box>
     </ThemeProvider>

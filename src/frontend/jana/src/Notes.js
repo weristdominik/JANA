@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { RichTreeView } from "@mui/x-tree-view/RichTreeView";
 
 // Editor
-import NoteEditor from "./components/notes/NoteEditor";
 
 const Notes = () => {
   const [treeData, setTreeData] = useState([]);
@@ -297,12 +296,6 @@ const Notes = () => {
       <button onClick={handleAddFolder}>Add Folder</button>
       <button onClick={handleAddDoc}>Add Doc</button>
       <button onClick={handleDeleteItem}>Delete Item</button>
-
-      <NoteEditor
-        content={fileContent}
-        lastSelectedItem={lastSelectedItem}
-        onChange={(json) => setFileContent(json)}
-      />
     </div>
   );
 };

@@ -32,7 +32,7 @@ Keep in mind that after changing .env Variables a restart of the [Frontend](#fro
 > Running Tests
 
 ```bash
-cd src
+# make sure to be in root dir
 source src/backend/venv/bin/activate
 pytest
 ```
