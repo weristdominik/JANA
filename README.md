@@ -21,6 +21,16 @@ cd src/frontend/jana
 npm start
 ```
 
+### Color Theme 
+
+> Inspired by Apple Notes: https://www.schemecolor.com/apple-notes-color-scheme.php
+
+Name: Sunglow, Hex: #FFD52E, RGB: (255, 213, 46)
+
+Name: Ghost White, Hex: #F9F9F9, RGB: (249, 249, 249)
+
+Name: Platinum, Hex: #E5E5E5, RGB: (229, 229, 229)
+
 ### Debug Mode
 
 For debugging purpose there is an `JANA_DEBUG` switch inside of `.env` file inside of [src/frontend/jana/src/](./src/frontend/jana/src/). If this option is set to `true` you will be able to access an webpage http://localhost:3000/debug . This will give you an full overview of the TreeView data and selectedItem as well as its content.
