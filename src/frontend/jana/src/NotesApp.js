@@ -274,18 +274,12 @@ const NotesApp = () => {
         )}
 
         {/* Editor Area */}
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            bgcolor: "background.default",
-            p: { xs: 1.5, sm: 2 }, // less padding on mobile
-            pt: { xs: 2, sm: 3 },  // small top space for breathing room
-            mt: isMobile ? 6 : 0,  // smaller margin when app bar present
-            overflow: "auto",
-          }}
-        >
-          <NoteEditor /> 
+        <Box component="main" sx={{ flexGrow: 1, bgcolor: "background.default", p: 2 }}>
+          {fileContent ? (
+            <NoteEditor fileContent={fileContent} fileId={lastSelectedItem?.id} />
+          ) : (
+            <Typography variant="body1">Select a file to start editing...</Typography>
+          )}
         </Box>
       </Box>
     </ThemeProvider>

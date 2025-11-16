@@ -4,12 +4,12 @@
     {
       "type": "heading",
       "attrs": {
-        "level": 1
+        "level": 2
       },
       "content": [
         {
           "type": "text",
-          "text": "Meeting Notes"
+          "text": "Hi there,"
         }
       ]
     },
@@ -18,7 +18,20 @@
       "content": [
         {
           "type": "text",
-          "text": "Important: "
+          "text": "this is a "
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "italic"
+            }
+          ],
+          "text": "basic"
+        },
+        {
+          "type": "text",
+          "text": " example of "
         },
         {
           "type": "text",
@@ -27,11 +40,11 @@
               "type": "bold"
             }
           ],
-          "text": "Launch on Friday"
+          "text": "Tiptap"
         },
         {
           "type": "text",
-          "text": "!"
+          "text": ". Sure, there are all kind of basic text styles you\u2019d probably expect from a text editor. But wait until you see the lists:"
         }
       ]
     },
@@ -46,7 +59,7 @@
               "content": [
                 {
                   "type": "text",
-                  "text": "Prepare release notes"
+                  "text": "That\u2019s a bullet list with one \u2026"
                 }
               ]
             }
@@ -60,9 +73,60 @@
               "content": [
                 {
                   "type": "text",
-                  "text": "Review UI fixes"
+                  "text": "\u2026 or two list items."
                 }
               ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Isn\u2019t that great? And all of that is editable. But wait, there\u2019s more. Let\u2019s try a code block:"
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": {
+        "language": "css"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "body {\n  display: none;\n}"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "I know, I know, this is impressive. It\u2019s only the tip of the iceberg though. Give it a try and click a little bit around. Don\u2019t forget to check the other examples too."
+        }
+      ]
+    },
+    {
+      "type": "blockquote",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Wow, that\u2019s amazing. Good work, boy! \ud83d\udc4f"
+            },
+            {
+              "type": "hardBreak"
+            },
+            {
+              "type": "text",
+              "text": "\u2014 Mom"
             }
           ]
         }
@@ -76,48 +140,17 @@
       "content": [
         {
           "type": "text",
-          "text": "hkhh"
+          "marks": [
+            {
+              "type": "italic"
+            },
+            {
+              "type": "strike"
+            }
+          ],
+          "text": "This is nice"
         }
       ]
-    },
-    {
-      "type": "paragraph",
-      "content": [
-        {
-          "type": "text",
-          "text": "jj"
-        }
-      ]
-    },
-    {
-      "type": "paragraph",
-      "content": [
-        {
-          "type": "text",
-          "text": "j"
-        }
-      ]
-    },
-    {
-      "type": "paragraph",
-      "content": [
-        {
-          "type": "text",
-          "text": "j"
-        }
-      ]
-    },
-    {
-      "type": "paragraph",
-      "content": [
-        {
-          "type": "text",
-          "text": "j"
-        }
-      ]
-    },
-    {
-      "type": "paragraph"
     }
   ]
 }
